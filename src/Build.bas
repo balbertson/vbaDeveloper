@@ -40,10 +40,9 @@ Option Explicit
 
 Private Const IMPORT_DELAY As String = "00:00:03"
 
-'We need to make these variables public such that they can be given as arguments to application.ontime()
-Public componentsToImport As Dictionary 'Key = componentName, Value = componentFilePath
-Public sheetsToImport As Dictionary 'Key = componentName, Value = File object
-Public vbaProjectToImport As VBProject
+Private componentsToImport As Dictionary 'Key = componentName, Value = componentFilePath
+Private sheetsToImport As Dictionary 'Key = componentName, Value = File object
+Private vbaProjectToImport As VBProject
 
 Public Sub testImport()
     Dim proj_name As String
@@ -204,7 +203,7 @@ Public Sub importVbaCode(vbaProject As VBProject, Optional includeClassFiles As 
         Exit Sub
     End If
 
-    'initialize globals for Application.OnTime
+    'initialize globals
     Set componentsToImport = New Dictionary
     Set sheetsToImport = New Dictionary
     Set vbaProjectToImport = vbaProject
@@ -225,11 +224,15 @@ Public Sub importVbaCode(vbaProject As VBProject, Optional includeClassFiles As 
         componentName = vComponentName
         removeComponent vbaProject, componentName
     Next
-    'Then import them
-    Debug.Print "Invoking 'Build.importComponents'with Application.Ontime with delay " & IMPORT_DELAY
-    ' to prevent duplicate modules, like MyClass1 etc.
-    Application.OnTime Now() + TimeValue(IMPORT_DELAY), "'Build.importComponents'"
-    Debug.Print "almost finished importing code for " & vbaProject.name
+    ' Prevent duplicate modules, like MyClass1
+    Application.Wait (Now() + TimeValue(IMPORT_DELAY))
+    ' Just to be safe, disable events.
+    ' When using OnTime, execution in other workbooks may continue.
+    ' For example, event code can be running when the import code starts rewriting it.
+    Application.EnableEvents = False
+    ' Then import them
+    Build.importComponents
+    Application.EnableEvents = True
 End Sub
 
 
