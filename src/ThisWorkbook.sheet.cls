@@ -5,14 +5,13 @@ Option Explicit
 '' and automatic code imports on open.
 
 
-' Private listener As EventListener
+Private listener As EventListener
 ' Private customAction As CustomActions
 
 '' Initialize member to listen to excel events
 Private Sub Workbook_Open()
-    Debug.Print "vbaDeveloper thisWorkbook_open()"
-    ' Set listener = New EventListener
-    ' Set customAction = New MyCustomActions
+    Set listener = New EventListener
+    'Set customAction = New MyCustomActions
     menu.createMenu
     ' customAction.afterOpen
 End Sub
@@ -20,7 +19,6 @@ End Sub
 
 '' Clean up our private members
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
-    Debug.Print "vbaDeveloper thisWorkbook_BeforeClose()"
     menu.deleteMenu
     ' If Not customAction Is Nothing Then
     '     customAction.BeforeClose
