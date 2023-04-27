@@ -49,13 +49,15 @@ End Sub
 
 Private Sub App_WorkbookOpen(ByVal wb As Workbook)
     On Error GoTo App_WorkbookOpen_Error
-
-    'Import all the modules for this workbook
-    Dim importNow As Integer
-    importNow = MsgBox("Import the code for " & wb.name & " now?", vbYesNo, "EventListener Workbook open event")
-    If importNow = vbYes Then
-        Build.importVbaCode wb.VBProject
-        NamedRanges.importNamedRanges wb
+    'Only import macro-enabled workbooks
+    If wb.FileFormat = xlOpenXMLWorkbookMacroEnabled Or wb.FileFormat = xlOpenXMLAddIn Then
+        'Import all the modules for this workbook
+        Dim importNow As Integer
+        importNow = MsgBox("Import the code for " & wb.name & " now?", vbYesNo, "EventListener Workbook open event")
+        If importNow = vbYes Then
+            Build.importVbaCode wb.VBProject
+            NamedRanges.importNamedRanges wb
+        End If
     End If
 
     Exit Sub
