@@ -34,7 +34,7 @@ unset ahead
 
 # Check for uncommitted changes
 if ! git diff --quiet --exit-code HEAD; then
-    echo "You have uncommitted changes to the following files."
+    msg "You have uncommitted changes to the following files."
     git diff --name-only HEAD
     if prompt-yn "Keep uncommitted changes and defer update?"; then
         msg "Deferring update."
@@ -46,8 +46,8 @@ if ! git diff --quiet --exit-code HEAD; then
     fi
 fi
 
-echo "The following updates are available."
-git log --oneline --no-decorate origin/HEAD..HEAD
+msg "The following updates are available."
+git log --no-decorate origin/HEAD...HEAD
 if ! prompt-yn "Do you accept them?"; then
     msg "Deferring update."
     sleep 2s
@@ -68,5 +68,5 @@ else
     return 1
 fi
 
-echo "Success"
+msg "Success"
 return 0
