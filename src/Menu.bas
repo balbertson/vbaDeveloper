@@ -18,9 +18,11 @@ Public Sub createMenu()
     Dim exSubMenu As CommandBarPopup
     Dim imSubMenu As CommandBarPopup
     Dim formatSubMenu As CommandBarPopup
+    Dim upSubMenu As CommandBarPopup
     Set exSubMenu = addSubmenu(rootMenu, 1, "Export code for ...")
     Set imSubMenu = addSubmenu(rootMenu, 2, "Import code for ...")
     Set formatSubMenu = addSubmenu(rootMenu, 3, "Format code for ...")
+    Set upSubMenu = addSubmenu(rootMenu, 4, "Update code for ...")
     addMenuSeparator rootMenu
     Dim refreshItem As CommandBarButton
     Set refreshItem = addMenuItem(rootMenu, "Menu.refreshMenu", MENU_REFRESH)
@@ -38,14 +40,16 @@ Public Sub createMenu()
         projectName = project.name
         caption = projectName & " (" & Dir(project.fileName) & ")" '<- this can throw error
 
-        Dim exCommand As String, imCommand As String, formatCommand As String
+        Dim exCommand As String, imCommand As String, formatCommand As String, upCommand As String
         exCommand = "'Menu.exportVbProject """ & project.fileName & """'"
         imCommand = "'Menu.importVbProject """ & project.fileName & """'"
         formatCommand = "'Menu.formatVbProject """ & project.fileName & """'"
+        upCommand = "'Git.update """ & project.name & """'"
 
         addMenuItem exSubMenu, exCommand, caption
         addMenuItem imSubMenu, imCommand, caption
         addMenuItem formatSubMenu, formatCommand, caption
+        addMenuItem upSubMenu, upCommand, caption
 nextProject:
     Next vProject
     On Error GoTo 0 'reset the error handling

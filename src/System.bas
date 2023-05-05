@@ -30,26 +30,16 @@ dwProcessID As Long
 dwThreadID As Long
 End Type
 
-Private Declare PtrSafe Function WaitForSingleObject Lib "kernel32" (ByVal _
-hHandle As Long, ByVal dwMilliseconds As Long) As Long
-
-Private Declare PtrSafe Function CreateProcessA Lib "kernel32" (ByVal _
-lpApplicationName As Long, ByVal lpCommandLine As String, ByVal _
-lpProcessAttributes As Long, ByVal lpThreadAttributes As Long, _
-ByVal bInheritHandles As Long, ByVal dwCreationFlags As Long, _
-ByVal lpEnvironment As Long, ByVal lpCurrentDirectory As Long, _
-lpStartupInfo As STARTUPINFO, lpProcessInformation As _
-PROCESS_INFORMATION) As Long
-
-Private Declare PtrSafe Function CloseHandle Lib "kernel32" (ByVal _
-hObject As Long) As Long
-
+Private Declare PtrSafe Function WaitForSingleObject Lib "kernel32" (ByVal hHandle As Long, ByVal dwMilliseconds As Long) As Long
+Private Declare PtrSafe Function CreateProcessA Lib "kernel32" (ByVal lpApplicationName As Long, ByVal lpCommandLine As String, ByVal lpProcessAttributes As Long, ByVal lpThreadAttributes As Long, ByVal bInheritHandles As Long, ByVal dwCreationFlags As Long, _
+ByVal lpEnvironment As Long, ByVal lpCurrentDirectory As Long, lpStartupInfo As STARTUPINFO, lpProcessInformation As PROCESS_INFORMATION) As Long
+Private Declare PtrSafe Function CloseHandle Lib "kernel32" (ByVal hObject As Long) As Long
 Private Declare PtrSafe Function GetExitCodeProcess Lib "kernel32" (ByVal hProcess As Long, lpExitCode As Long) As Long
 
 Private Const NORMAL_PRIORITY_CLASS = &H20&
 Private Const INFINITE = -1&
 
-Public Function execCmd(cmdline As String) As Long
+Public Sub execCmd(cmdline As String)
 Dim proc As PROCESS_INFORMATION
 Dim start As STARTUPINFO
 Dim ReturnValue As Integer
@@ -70,6 +60,7 @@ Loop Until ReturnValue <> 258
 
 ReturnValue = GetExitCodeProcess(proc.hProcess, EC)
 ReturnValue = CloseHandle(proc.hProcess)
-execCmd = EC
-End Function
-
+If EC <> 0 Then
+    ErrorHandling.RaiseError CInt(EC), "System.execCmd", "Command failed"
+End If
+End Sub
