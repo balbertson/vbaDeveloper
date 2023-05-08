@@ -13,7 +13,7 @@ Public Sub unpackXML(fileShortName As String)
 
     Dim fileName As String, exportPath As String, exportPathXML As String
     fileName = Workbooks(fileShortName).FullName
-    exportPath = getSourceDir(fileName, createIfNotExists:=True)
+    exportPath = getSourceDir(Workbooks(fileShortName).VBProject, createIfNotExists:=True)
     exportPathXML = exportPath & XML_FOLDER_NAME
 
     Dim FSO As New Scripting.FileSystemObject

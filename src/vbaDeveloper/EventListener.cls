@@ -47,31 +47,28 @@ End Sub
 
 
 Private Sub App_WorkbookOpen(ByVal wb As Workbook)
-    On Error GoTo ImportOnOpenNotFound
+    On Error GoTo App_WorkbookOpen_Error
+    ' Check if the ImportOnEvent value is defined
+    If Build.ImportOnEvent.Exists(wb.name) = False Then
+        Debug.Print "ImportOnEvent not found for " & wb.name
+        ' If the global variable isn't set, continue on as if it were disabled
+        Build.ImportOnEvent.Add wb.name, False
+    End If
     ' Importing during open can be disabled
-    If wb.ImportOnOpen = False Then
+    If Build.ImportOnEvent(wb.name) = False Then
         Debug.Print "Importing on workbook open is disabled for " & wb.name
         Exit Sub
     End If
-    On Error GoTo App_WorkbookOpen_Error
     ' Only import macro-enabled workbooks
-    If wb.FileFormat <> xlOpenXMLWorkbookMacroEnabled And wb.FileFormat <> xlOpenXMLAddIn Then
-        Debug.Print wb.name & " is not macro-enabled. Skipping import."
+    If wb.HasVBProject = True Then
+        Debug.Print wb.name & " does not have a VB Project. Skipping import."
         Exit Sub
     End If
     ' Import all the modules for this workbook
-    Dim importNow As Integer
-    importNow = MsgBox("Import the code for " & wb.name & " now?", vbYesNo, "EventListener Workbook open event")
-    If importNow = vbNo Then
-        Exit Sub
-    End If
     Application.EnableEvents = False
     Build.importVbaCode wb.VBProject
     Application.EnableEvents = True
     Exit Sub
-ImportOnOpenNotFound:
-    ' If the global variable isn't set, continue on as if it were set to True
-    Resume Next
 App_WorkbookOpen_Error:
     ErrorHandling.handleError "vbaDeveloper.EventListener WorkbookOpen"
     Application.EnableEvents = True

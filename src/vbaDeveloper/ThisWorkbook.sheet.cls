@@ -7,11 +7,11 @@ Option Explicit
 
 Private listener As EventListener
 ' Private customAction As CustomActions
-Public ImportOnOpen As Boolean
 
 '' Initialize member to listen to excel events
 Private Sub Workbook_Open()
-    ImportOnOpen = True
+    Debug.Print "Disabling import for " & Application.ThisWorkbook.name
+    Build.ImportOnEvent(Application.ThisWorkbook.name) = False
     Set listener = New EventListener
     'Set customAction = New MyCustomActions
     menu.createMenu

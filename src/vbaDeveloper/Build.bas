@@ -37,8 +37,9 @@ Attribute VB_Name = "Build"
 
 Option Explicit
 
+Global ImportOnEvent As New Scripting.Dictionary
 
-Private Const IMPORT_DELAY As String = "00:00:03"
+Private Const IMPORT_DELAY As String = "00:00:06"
 
 Private componentsToImport As Dictionary 'Key = componentName, Value = componentFilePath
 Private sheetsToImport As Dictionary 'Key = componentName, Value = File object
@@ -74,7 +75,8 @@ End Sub
 ' Usually called with: fullWorkbookPath = wb.FullName or fullWorkbookPath = vbProject.fileName
 ' if the workbook is new and has never been saved,
 ' vbProject.fileName will throw an error while wb.FullName will return a name without slashes.
-Public Function getSourceDir(fullWorkbookPath As String, createIfNotExists As Boolean) As String
+Public Function getSourceDir(vbaProject As VBProject, createIfNotExists As Boolean) As String
+    Dim fullWorkbookPath As String: fullWorkbookPath = vbaProject.fileName
     ' First check if the fullWorkbookPath contains a \.
     If Not InStr(fullWorkbookPath, "\") > 0 Then
         'In this case it is a new workbook, we skip it
@@ -87,7 +89,7 @@ Public Function getSourceDir(fullWorkbookPath As String, createIfNotExists As Bo
     Dim srcDir As String
     srcDir = projDir & "src\"
     Dim exportDir As String
-    exportDir = srcDir '& FSO.GetBaseName(fullWorkbookPath) & "\"
+    exportDir = srcDir & vbaProject.name & "\"
 
     If createIfNotExists Then
         If Not FSO.FolderExists(srcDir) Then
@@ -122,7 +124,7 @@ Public Sub exportVbaCode(vbaProject As VBProject)
     End If
 
     Dim export_path As String
-    export_path = getSourceDir(vbProjectFileName, createIfNotExists:=True)
+    export_path = getSourceDir(vbaProject, createIfNotExists:=True)
 
     Debug.Print "exporting to " & export_path
     'export all components
@@ -196,7 +198,7 @@ Public Sub importVbaCode(vbaProject As VBProject, Optional includeClassFiles As 
     End If
 
     Dim export_path As String
-    export_path = getSourceDir(vbProjectFileName, createIfNotExists:=False)
+    export_path = getSourceDir(vbaProject, createIfNotExists:=False)
     If export_path = "" Then
         'The source directory does not exist, code has never been exported for this vbaProject.
         Debug.Print "No import directory for project " & vbaProject.name & ", skipping"
