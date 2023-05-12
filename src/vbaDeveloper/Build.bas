@@ -39,8 +39,6 @@ Option Explicit
 
 Global ImportOnEvent As New Scripting.Dictionary
 
-Private Const IMPORT_DELAY As String = "00:00:06"
-
 Private componentsToImport As Dictionary 'Key = componentName, Value = componentFilePath
 Private sheetsToImport As Dictionary 'Key = componentName, Value = File object
 Private vbaProjectToImport As VBProject
@@ -230,13 +228,9 @@ Public Sub importVbaCode(vbaProject As VBProject, Optional includeClassFiles As 
         componentName = vComponentName
         removeComponent vbaProject, componentName
     Next
-    ' Prevent duplicate modules, like MyClass1
-    Application.Wait (Now() + TimeValue(IMPORT_DELAY))
     ' Just to be safe, disable events.
-    ' When using OnTime, execution in other workbooks may continue.
-    ' For example, event code can be running when the import code starts rewriting it.
     Application.EnableEvents = False
-    ' Then import them
+    ' Then import components
     Build.importComponents
     Application.EnableEvents = True
 End Sub
@@ -280,11 +274,18 @@ End Sub
 
 
 ' Only removes the vba component if it exists
-Private Sub removeComponent(vbaProject As VBProject, componentName As String)
+Private Sub removeComponent(vbaProject As VBProject, ByVal componentName As String)
     If componentExists(vbaProject, componentName) Then
         Dim c As VBComponent
         Set c = vbaProject.VBComponents(componentName)
         Debug.Print "removing " & c.name
+        ' Renaming the component before removing it. There won't be a name conflict if the remove isn't completely
+        ' finished before the import happens. Consequently, modules won't be automatically renamed with a "1" suffix.
+        ' Reference: https://stackoverflow.com/questions/19800184/vbcomponents-remove-doesnt-always-remove-module
+        If c.Type <> vbext_ct_Document Then
+            c.name = componentName & "_remove"
+            Set c = vbaProject.VBComponents(componentName & "_remove")
+        End If
         vbaProject.VBComponents.Remove c
     End If
 End Sub
