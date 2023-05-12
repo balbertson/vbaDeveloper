@@ -139,6 +139,10 @@ Public Sub exportVbaCode(vbaProject As VBProject)
                 Case vbext_ct_StdModule
                     exportComponent export_path, component, ".bas"
                 Case vbext_ct_MSForm
+                    ' For whatever reason, exporting a form adds one blank line to the top of the code.
+                    ' This shows up as a modification in version control, which is annoying.
+                    ' Deleting the top line before exporting counteracts this problem.
+                    component.CodeModule.DeleteLines 1
                     exportComponent export_path, component, ".frm"
                 Case vbext_ct_Document
                     exportLines export_path, component
