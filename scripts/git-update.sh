@@ -9,13 +9,16 @@ source ${this_script_dir}/git-utils.sh
 msg "Checking for updates"
 
 git fetch
+# Set the origin/HEAD ref
+# This is normally done by clone, but this repo might've been copied without the clone command. 
+git remote set-head origin -a
 
 # Check if the default branch is being used
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 default_branch=$(basename $(git rev-parse --abbrev-ref origin/HEAD))
 if [[ "$current_branch" != "$default_branch" ]]; then
     msg "Current branch ($current_branch) differs from default branch ($default_branch)."
-    prompt "Assuming developer and aborting update."
+    prompt "Assuming developer and aborting update. Hit <Enter> to continue."
     return 1
 fi
 
@@ -29,7 +32,7 @@ fi
 # Get the number of commits that origin/HEAD is ahead of HEAD
 ahead=$(git rev-list --left-right --count origin/HEAD...HEAD | gawk '{print $2}')
 if [[ $ahead -ne 0 ]]; then
-    prompt "HEAD is ahead of origin by $ahead commits. Assuming developer and aborting update."
+    prompt "HEAD is ahead of origin by $ahead commits. Assuming developer and aborting update. Hit <Enter> to continue."
     return 1
 fi
 unset ahead
@@ -48,9 +51,9 @@ if ! git diff --quiet --exit-code HEAD; then
     fi
 fi
 
-msg "The following updates are available."
+msg "The following commits can be applied."
 git log --no-decorate origin/HEAD...HEAD
-if ! prompt-yn "Do you accept them?"; then
+if ! prompt-yn "Do you want to apply them?"; then
     msg "Deferring update."
     sleep 2s
     return 1
@@ -59,16 +62,16 @@ fi
 if git merge --ff-only; then
     msg "Fast-forward complete."
 else
-    error "A problem occurred while fast-forwarding."
+    prompt +2 "A problem occurred while fast-forwarding. Hit <Enter> to continue."
     return 1
 fi
 
 if git submodule update; then
     msg "Submodule update complete."
 else
-    error "A problem occurred while updating submodule."
+    prompt +2 "A problem occurred while updating submodule. Hit <Enter> to continue."
     return 1
 fi
 
-prompt "Update successful."
+msg "Update successful."
 return 0
