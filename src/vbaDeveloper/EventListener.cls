@@ -15,11 +15,9 @@ Option Explicit
 Private WithEvents App As Application
 Attribute App.VB_VarHelpID = -1
 
-
 Private Sub Class_Initialize()
     Set App = Application
 End Sub
-
 
 Private Sub App_WorkbookAfterSave(ByVal wb As Workbook, ByVal success As Boolean)
     On Error GoTo App_WorkbookAfterSave_Error
@@ -45,12 +43,12 @@ Private Sub App_WorkbookBeforeSave(ByVal wb As Workbook, ByVal SaveAsUI As Boole
     End If
 End Sub
 
-
 Private Sub App_WorkbookOpen(ByVal wb As Workbook)
-    On Error GoTo App_WorkbookOpen_Error
-    ' Check if the ImportOnEvent value is defined
+    Debug.Print "App_WorkbookOpen on " & wb.name
+    On Error GoTo ImportOnOpenNotFound
+    ' Check if the ImportOnOpen value is defined
     If Build.ImportOnEvent.Exists(wb.name) = False Then
-        Debug.Print "ImportOnEvent not found for " & wb.name
+        Debug.Print "ImportOnOpen not found for " & wb.name
         ' If the global variable isn't set, continue on as if it were disabled
         Build.ImportOnEvent.Add wb.name, False
     End If
@@ -59,6 +57,7 @@ Private Sub App_WorkbookOpen(ByVal wb As Workbook)
         Debug.Print "Importing on workbook open is disabled for " & wb.name
         Exit Sub
     End If
+    On Error GoTo App_WorkbookOpen_Error
     ' Only import macro-enabled workbooks
     If wb.HasVBProject = True Then
         Debug.Print wb.name & " does not have a VB Project. Skipping import."
@@ -69,6 +68,9 @@ Private Sub App_WorkbookOpen(ByVal wb As Workbook)
     Build.importVbaCode wb.VBProject
     Application.EnableEvents = True
     Exit Sub
+ImportOnOpenNotFound:
+    Debug.Print "Dictionary problem"
+    Resume Next
 App_WorkbookOpen_Error:
     ErrorHandling.handleError "vbaDeveloper.EventListener WorkbookOpen"
     Application.EnableEvents = True
