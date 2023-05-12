@@ -44,7 +44,7 @@ Private Sub App_WorkbookBeforeSave(ByVal wb As Workbook, ByVal SaveAsUI As Boole
 End Sub
 
 Private Sub App_WorkbookOpen(ByVal wb As Workbook)
-    Debug.Print "App_WorkbookOpen on " & wb.name
+    Debug.Print "EventListener open for " & wb.name
     On Error GoTo ImportOnOpenNotFound
     ' Check if the ImportOnOpen value is defined
     If Build.ImportOnEvent.Exists(wb.name) = False Then
@@ -60,6 +60,7 @@ Private Sub App_WorkbookOpen(ByVal wb As Workbook)
     On Error GoTo App_WorkbookOpen_Error
     ' Only import macro-enabled workbooks
     If wb.HasVBProject = True Then
+    'If wb.FileFormat <> xlOpenXMLWorkbookMacroEnabled And wb.FileFormat <> xlOpenXMLAddIn Then
         Debug.Print wb.name & " does not have a VB Project. Skipping import."
         Exit Sub
     End If

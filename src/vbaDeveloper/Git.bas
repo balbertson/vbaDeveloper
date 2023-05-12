@@ -22,7 +22,7 @@ Public Sub gitBash(usrcmd As String, vbaProject As VBProject)
     Dim workdir As String
     Dim EC As Integer
     
-    workdir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(vbaProject.filename)
+    workdir = CreateObject("Scripting.FileSystemObject").GetParentFolderName(vbaProject.fileName)
 
     On Error GoTo gitBashErrorHandler
     ' Get full path to installation directory
@@ -66,9 +66,9 @@ Public Sub gitBashScript(script As String, vbaProject As VBProject, Optional arg
 
     ' Act on the path_override param
     If path_override = True Then
-        path = vbaProject.filename
+        path = vbaProject.fileName
     Else
-        path = Application.VBE.VBProjects("vbaDeveloper").filename
+        path = Application.VBE.VBProjects("vbaDeveloper").fileName
     End If
     
     ' Remove the file name of the workbook
@@ -141,7 +141,7 @@ Private Function createPostBashScript(path As String) As String
     
     scriptname = path & "/" & LOGBASE & ".sh"
     
-    Set f = CreateObject("Scripting.FileSystemObject").OpenTextFile(scriptname, IOMode:=ForWriting, Create:=True, Format:=TristateFalse)
+    Set f = CreateObject("Scripting.FileSystemObject").OpenTextFile(scriptname, IOMode:=ForWriting, Create:=True, format:=TristateFalse)
     
     ' capture the exit code
     f.WriteLine "EC=$?"
@@ -157,7 +157,7 @@ Private Function getGitBashEC(path As String) As Integer
     Dim f
     Dim EC As String
 
-    Set f = CreateObject("Scripting.FileSystemObject").OpenTextFile(path & "\" & EC_LOG, IOMode:=ForReading, Create:=False, Format:=TristateFalse)
+    Set f = CreateObject("Scripting.FileSystemObject").OpenTextFile(path & "\" & EC_LOG, IOMode:=ForReading, Create:=False, format:=TristateFalse)
     
     EC = f.ReadLine
     f.Close

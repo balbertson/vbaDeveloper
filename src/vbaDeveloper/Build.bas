@@ -6,7 +6,7 @@ Attribute VB_Name = "Build"
 ' 2. From tools references... add
 '     * Microsoft Visual Basic for Applications Extensibility 5.3
 '     * Microsoft Scripting Runtime
-' 3. Rename the project to 'vbaDeveloper' (in Project Explorer (Ctrl+R to show) select current project and click F4 
+' 3. Rename the project to 'vbaDeveloper' (in Project Explorer (Ctrl+R to show) select current project and click F4
 '    to open Properties window. Then set property '(Name)' to 'vbaDeveloper')
 ' 4. Enable programatic access to VBA:
 '       File -> Options -> Trust Center, Trust Center Settings, -> Macros,
@@ -15,10 +15,10 @@ Attribute VB_Name = "Build"
 '           [HKEY_CURRENT_USER\Software\Policies\Microsoft\office\{Excel-Version}\excel\security]
 '           "accessvbom"=dword:00000001
 '       If you get 'path not found' exception in Excel 2013, include the following step:
-'           In 'Trust Center' settings, go to 'File Block Settings' and un-check 'open' and/or 'save' 
+'           In 'Trust Center' settings, go to 'File Block Settings' and un-check 'open' and/or 'save'
 '           for 'Excel 2007 and later Macro-Enabled Workbooks and Templates'.
 ' 5. If using a non-English version of Excel, rename your current workbook into ThisWorkbook (in VB Editor, press Ctrl+R,
-'    then in the Project Explorer (under the local folder name for Microsoft Excel Objects) select the workbook. Set the 
+'    then in the Project Explorer (under the local folder name for Microsoft Excel Objects) select the workbook. Set the
 '    property (F4 to show Properties window) '(Name)' to ThisWorkbook).
 ' 6. In VB Editor, press F4, then under Microsoft Excel Objects, select ThisWorkbook in vbaDeveloper. Set the property 'IsAddin' to TRUE
 ' 7. In VB Editor, menu File-->Save Book1; Save as vbaDeveloper.xlam in the same directory as 'src' and the 'README.md' file
@@ -140,7 +140,7 @@ Public Sub exportVbaCode(vbaProject As VBProject)
                     ' For whatever reason, exporting a form adds one blank line to the top of the code.
                     ' This shows up as a modification in version control, which is annoying.
                     ' Deleting the top line before exporting counteracts this problem.
-                    component.CodeModule.DeleteLines 1
+                    component.codeModule.DeleteLines 1
                     exportComponent export_path, component, ".frm"
                 Case vbext_ct_Document
                     exportLines export_path, component
@@ -259,12 +259,12 @@ Private Sub checkHowToImport(file As Object, includeClassFiles As Boolean)
                     ' In that case they'll have to be imported manually.
                     If includeClassFiles Then
                         'importComponent vbaProject, file
-                        componentsToImport.Add componentName, file.Path
+                        componentsToImport.Add componentName, file.path
                     End If
                 End If
             Case ".bas", ".frm"
                 'importComponent vbaProject, file
-                componentsToImport.Add componentName, file.Path
+                componentsToImport.Add componentName, file.path
             Case Else
                 'do nothing
                 Debug.Print "Skipping file " & fileName
@@ -342,7 +342,7 @@ Private Sub importLines(vbaProject As VBProject, file As Object)
     ' At this point compilation errors may cause a crash, so we ignore those.
     On Error Resume Next
     c.codeModule.DeleteLines 1, c.codeModule.CountOfLines
-    c.codeModule.AddFromFile file.Path
+    c.codeModule.AddFromFile file.path
     On Error GoTo 0
 End Sub
 
